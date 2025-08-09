@@ -1,0 +1,96 @@
+
+Here is the output for phase ENTITIES:
+
+---
+
+### Domain Model
+
+The domain model for this project is based on the stored procedure and DB conventions. The following JPA @Entity classes have been generated:
+```
+[FILE: src/main/java/com/example/sample2/domain/Order.java]
+```
+package com.example.sample2.domain;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "orders")
+public class Order {
+    @Id
+    private Long id;
+
+    private String customerName;
+
+    private Double totalAmount;
+
+    private Boolean priority;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public Boolean getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Boolean priority) {
+        this.priority = priority;
+    }
+}
+```
+---
+
+### README
+
+This project uses the following domain model:
+
+* `Order`
+  * `@Entity`
+  * `@Table(name = "orders")`
+  * `id`: `@Id`
+  * `customerName`: `String`
+  * `totalAmount`: `Double`
+  * `priority`: `Boolean`
+
+The stored procedure `process_orders` is used to update the orders table. The following fields are inferred from the SP:
+
+* `id`: `@Id`
+* `customerName`: `String`
+* `totalAmount`: `Double`
+* `priority`: `Boolean`
+
+---
+
+### Assumptions
+
+The following assumptions have been made for this phase:
+
+* The stored procedure `process_orders` is used to update the orders table.
+* The domain model is based on the stored procedure and DB conventions.
+* The schema of the database is unknown, so the minimal viable fields used by the SP are inferred.
+
+---
+
+### Next Phase
+
+The next phase would be to generate the JPA repository for the `Order` entity. This will allow us to interact with the orders table using Spring Data JPA.

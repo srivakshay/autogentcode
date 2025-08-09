@@ -1,0 +1,6 @@
+graph LR
+    OrderController[OrderController] --> OrderService[OrderService]
+    OrderService --> OrderRepository[OrderRepository]
+    OrderRepository --> OrderEntity[OrderEntity]
+    OrderMapper[OrderMapper] .> OrderEntity
+    OrderMapper .> OrderDto

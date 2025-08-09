@@ -1,0 +1,6 @@
+graph LR
+  Client[Client] --> API[API]
+  API --> Service[Service]
+  Service --> Repository[Repository]
+  Repository --> Database[Database]
+  Database --> ExternalSystems[External Systems]

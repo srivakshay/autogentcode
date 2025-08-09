@@ -1,0 +1,7 @@
+graph LR
+  Controller[Controller] --> Service[Service]
+  Service --> Repository[Repository]
+  Repository --> Entity[Entity]
+  Repository --> DTO[DTO]
+  Repository --> Mapper[Mapper]
+  Mapper --> Entity

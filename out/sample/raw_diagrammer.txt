@@ -1,0 +1,481 @@
+
+
+
+Here are the two Mermaid diagrams for the given project:
+```mermaid
+graph LR
+  Client[Client] --> API[API]
+  API --> Service[Service]
+  Service --> Repository[Repository]
+  Repository --> Database[Database]
+  Database --> ExternalSystems[External Systems]
+```
+
+```mermaid
+graph LR
+  Controller[Controller] --> Service[Service]
+  Service --> Repository[Repository]
+  Repository --> Entity[Entity]
+  Repository --> DTO[DTO]
+  Repository --> Mapper[Mapper]
+  Mapper --> Entity
+```
+
+
+
+Note that the high-level diagram shows the overall architecture of the system, including the client, API, service, repository, and database. The low-level diagram shows the components and classes in more detail, including the controller, service, repository, entities, DTOs, and mappers.
+
+
+
+The naming conventions used in the diagrams are consistent with those used in the code, with the exception of the external systems, which are not explicitly mentioned in the code but are implied by the fact that they are a part of the database.
+
+
+
+
+
+The two diagrams are separated by a blank line to make it easier to read and understand the code.
+
+
+
+
+
+
+
+The first diagram shows the high-level architecture of the system, including the client, API, service, repository, and database. The second diagram shows the components and classes in more detail, including the controller, service, repository, entities, DTOs, and mappers.
+
+
+
+
+
+The naming conventions used in the diagrams are consistent with those used in the code, with the exception of the external systems, which are not explicitly mentioned in the code but are implied by the fact that they are a part of the database.
+
+
+
+
+
+The two diagrams are separated by a blank line to make it easier to read and understand the code.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Here is the SOLID, production-ready Java Spring Boot skeleton for the given project:
+```
+[FILE: build.gradle]
+plugins {
+    id 'org.springframework.boot' version '2.5.3'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+```
+
+```
+[FILE: pom.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.example</groupId>
+    <artifactId>sample</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>sample</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+```
+[FILE: src/main/java/com/example/demo/controller/OrderController.java]
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.*;
+import com.example.demo.service.OrderService;
+
+@RestController
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping("/orders")
+    public void createOrder(@RequestBody OrderDto orderDto) {
+        orderService.createOrder(orderDto);
+    }
+
+}
+```
+
+```
+[FILE: src/main/java/com/example/demo/service/OrderService.java]
+package com.example.demo.service;
+
+import org.springframework.stereotype.Service;
+import com.example.demo.repository.OrderRepository;
+import com.example.demo.dto.OrderDto;
+
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+
+    public OrderService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
+
+    public void createOrder(OrderDto orderDto) {
+        orderRepository.save(orderDto);
+    }
+
+}
+```
+
+```
+[FILE: src/main/java/com/example/demo/repository/OrderRepository.java]
+package com.example.demo.repository;
+
+import org.springframework.data.jpa.repository.*;
+import com.example.demo.entity.OrderEntity;
+
+public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
+
+}
+```
+
+```
+[FILE: src/main/java/com/example/demo/entity/OrderEntity.java]
+package com.example.demo.entity;
+
+import javax.persistence.*;
+
+@Entity
+public class OrderEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String customerName;
+
+    private Double totalAmount;
+
+    private Boolean priority;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public Boolean getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Boolean priority) {
+        this.priority = priority;
+    }
+
+}
+```
+
+```
+[FILE: src/main/java/com/example/demo/dto/OrderDto.java]
+package com.example.demo.dto;
+
+public class OrderDto {
+
+    private Long id;
+
+    private String customerName;
+
+    private Double totalAmount;
+
+    private Boolean priority;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public Boolean getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Boolean priority) {
+        this.priority = priority;
+    }
+
+}
+```
+
+```
+[FILE: src/main/java/com/example/demo/mapper/OrderMapper.java]
+package com.example.demo.mapper;
+
+import org.mapstruct.*;
+import com.example.demo.entity.OrderEntity;
+import com.example.demo.dto.OrderDto;
+
+@Mapper(componentModel = "spring")
+public interface OrderMapper {
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "priority", source = "totalAmount")
+    OrderEntity toEntity(OrderDto orderDto);
+
+}
+```
+
+```
+[FILE: src/test/java/com/example/demo/service/OrderServiceTest.java]
+package com.example.demo.service;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import com.example.demo.dto.OrderDto;
+import com.example.demo.entity.OrderEntity;
+import com.example.demo.repository.OrderRepository;
+import static org.assertj.core.api.Assertions.*;
+
+@SpringBootTest
+public class OrderServiceTest {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Test
+    public void createOrder_shouldSaveOrderInDatabase() {
+        // given
+        OrderDto orderDto = new OrderDto();
+        orderDto.setCustomerName("John Doe");
+        orderDto.setTotalAmount(100.0);
+
+        // when
+        orderService.createOrder(orderDto);
+
+        // then
+        assertThat(orderRepository.findAll()).hasSize(1);
+    }
+
+}
+```
+Note that the above code is just a sample and may need to be modified based on specific requirements. Additionally, this code assumes that the database is PostgreSQL, but if the SQL logic clearly targets another DB, you should adjust the code accordingly.
+
+
+
+
+Here are the Mermaid diagrams for the given project:
+
+### High-level architecture diagram (Context/Containers)
+```mermaid
+graph LR
+    Client[Client] --> API[API]
+    API --> Service[Service]
+    Service --> Repository[Repository]
+    Repository --> Database[Database]
+    ExternalSystems[External Systems] .> API
+```
+### Low-level diagram (Components/Classes)
+```mermaid
+graph LR
+    OrderController[OrderController] --> OrderService[OrderService]
+    OrderService --> OrderRepository[OrderRepository]
+    OrderRepository --> OrderEntity[OrderEntity]
+    OrderMapper[OrderMapper] .> OrderEntity
+    OrderMapper .> OrderDto
+```
+

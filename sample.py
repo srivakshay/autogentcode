@@ -1,77 +1,44 @@
 import os
-import asyncio
-import base64
-from google.adk.agents import LlmAgent
-from google.adk.runners import InMemoryRunner
-from google.genai import types
+from llama_index.core import StorageContext, VectorStoreIndex, Settings
+from llama_index.readers.file import FlatReader
+from llama_index.core.node_parser import MarkdownNodeParser
+from llama_index.vector_stores.opensearch import OpensearchVectorStore, OpensearchVectorClient
+from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
+from pathlib import Path
 
-# 1. Configuration for Azure OpenAI (via ADK's model interface)
-# ADK can interface with Azure models by setting the model string 
-# to "azure/<deployment-name>" when using compatible backends.
-AZURE_MODEL = f"azure/{os.getenv('AZURE_OPENAI_DEPLOYMENT_NAME')}"
-
-# 2. Define the Agent
-image_analyzer = LlmAgent(
-    name="ImageAnalyzer",
-    model=AZURE_MODEL,
-    instruction="""
-    You are an expert visual analyst. 
-    Your task is to examine the provided image and describe its contents clearly.
-    Focus on objects, colors, context, and any visible text. 
-    Provide a concise summary of what the image is about.
-    """
+# 1. Setup Embedding Model
+Settings.embed_model = AzureOpenAIEmbedding(
+    model="text-embedding-3-small",
+    deployment_name="text-embedding-3-small",
+    api_key=os.environ["AZURE_OPENAI_KEY"],
+    azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
 )
 
-def encode_image_to_base64(image_path):
-    """Helper to convert local image to base64 for ADK parts."""
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+# 2. Parse Markdown
+# FlatReader reads the file as a single document; MarkdownNodeParser breaks it by logic
+reader = FlatReader()
+md_docs = reader.load_data(Path("./data/document.md"))
 
-### 2. Main Test Function
+# Use MarkdownNodeParser to respect headers (# ## ###)
+# This ensures that a chunk doesn't cut off in the middle of a sub-section
+parser = MarkdownNodeParser()
+nodes = parser.get_nodes_from_documents(md_docs)
 
-async def main():
-    # Setup Runner
-    runner = InMemoryRunner(agent=image_analyzer)
-    
-    # Path to your test image
-    image_path = "sample_image.jpg" 
-    
-    if not os.path.exists(image_path):
-        print(f"Please provide a valid image path. {image_path} not found.")
-        return
+# 3. OpenSearch Connection
+client = OpensearchVectorClient(
+    endpoint="https://your-opensearch-endpoint:9200",
+    index_name="markdown_index",
+    dim=1536,
+    http_auth=("admin", "admin")
+)
 
-    # Convert image to a Part object
-    image_base64 = encode_image_to_base64(image_path)
-    
-    # Construct the multimodal message
-    user_message = types.Content(
-        role="user",
-        parts=[
-            types.Part(text="What is in this image?"),
-            types.Part(
-                inline_data=types.Blob(
-                    data=image_base64,
-                    mime_type="image/jpeg"
-                )
-            )
-        ]
-    )
+vector_store = OpensearchVectorStore(client)
+storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
-    print("--- Analyzing Image ---")
-    
-    # Run the agent
-    # Note: Replace 'user_123' and 'session_456' with your logic if needed
-    events = runner.run(
-        user_id="test_user",
-        session_id="test_session",
-        new_message=user_message
-    )
+# 4. Vectorize and Store
+index = VectorStoreIndex(
+    nodes, 
+    storage_context=storage_context
+)
 
-    # Process and print the stream of events
-    for event in events:
-        if event.is_final_response():
-            print("\nAnalysis Result:")
-            print(event.content.parts[0].text)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+print(f"Successfully indexed {len(nodes)} markdown nodes to OpenSearch.")
